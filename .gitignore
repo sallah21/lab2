@@ -8,3 +8,7 @@ verdi_config_file
 *.rc
 *fsdb
 verdiLog/*
+vcs_simv.vdb/
+urgReport/
+*.xml
+vdCovLog/
