@@ -1,12 +1,24 @@
 `timescale 1ns / 1ps
 
-module uart_tx (
+module uart_tx #(
+  parameter BAUD_RATE = 115_200,
+  parameter CLOCK_RATE = 50_000_000
+) (
   input wire i_clk,
   input wire i_rst,
   input wire [7:0] i_data_in,
   input wire i_send_data,
   output wire o_transmission,
   output wire o_tx_out
+);
+
+uart_baud_gen #(
+  .BAUD_RATE  (BAUD_RATE),
+  .CLOCK_RATE (CLOCK_RATE)
+) uart_baud_gen_rx_i0 (
+  .i_clk         (i_clk),
+  .i_rst         (i_rst),
+  .o_baud_x16_en (i_baud_x16_en)
 );
 
 parameter  IDLE  = 2'b00, START = 2'b01, DATA  = 2'b10, STOP  = 2'b11;
@@ -27,7 +39,10 @@ always @(posedge i_clk or negedge i_rst) begin
     tx_out <= 1; // idle state for tx is high
   end
   else begin 
-    current_state <= next_state;
+    if (i_baud_x16_en) begin
+      // State transition
+      current_state <= next_state;
+    end
     case (current_state)
       IDLE: begin
         if (i_send_data) begin
