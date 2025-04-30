@@ -3,3 +3,4 @@ csrc/*
 *.key
 vcs_simv
 vcs_simv.daidir/*
+verdi_config_file
