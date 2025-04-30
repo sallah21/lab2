@@ -65,25 +65,25 @@ module uart_tb
         .o_transmission(transmission)
    ) ;//Uart transmitter
  
-    initial  //Data to send preparation
-       begin
-           bytes_to_send = { 8'h57,
-                             8'h65,
-                             8'h6C,
-                             8'h6C,
-                             8'h20,
-                             8'h44,
-                             8'h6F,
-                             8'h6E,
-                             8'h65 };
+    // initial  //Data to send preparation
+    //    begin
+    //        bytes_to_send = { 8'h57,
+    //                          8'h65,
+    //                          8'h6C,
+    //                          8'h6C,
+    //                          8'h20,
+    //                          8'h44,
+    //                          8'h6F,
+    //                          8'h6E,
+    //                          8'h65 };
        
-           bits_to_send[0] = 1'b1;
+    //        bits_to_send[0] = 1'b1;
            
-           for (i = 0 ; i < BYTE_TO_SEND_NUM ; i=i+1)
-              begin
-                  bits_to_send[(i*10+1)+:10] = add_start_and_stop_bit(bytes_to_send[(i*8)+:8]);
-              end                      
-       end
+    //        for (i = 0 ; i < BYTE_TO_SEND_NUM ; i=i+1)
+    //           begin
+    //               bits_to_send[(i*10+1)+:10] = add_start_and_stop_bit(bytes_to_send[(i*8)+:8]);
+    //           end                      
+    //    end
    
 //    initial //Main Inital
 //        begin
@@ -114,6 +114,7 @@ module uart_tb
            rst = 1'b1;
        
            for (i = 0; i < BYTE_TO_SEND_NUM; i = i + 1) begin
+            //    wait(data_rdy); // Wait for data ready signal
                bits_to_send_tx = 8'b10101011; // 8'h55;
                send_data = 1'b1; // Pulse send_data
                #CLK_T;           // Wait for one clock cycle
@@ -124,7 +125,7 @@ module uart_tb
                #BAUD_RATE_T; // Add some delay before sending the next byte
            end
        
-           #10000
+           #1000000
            $finish;
        end       
    always #(CLK_T/2) clk = ~clk; //clock 
