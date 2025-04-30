@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 module meta_harden (
   input            i_clk_dst,      // Destination clock
   input            i_rst_dst,      // Reset - synchronous to destination clock

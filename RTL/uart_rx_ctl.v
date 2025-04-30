@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 module uart_rx_ctl (
   input            i_clk,           // Clock input
   input            i_rst,          // Active HIGH reset - synchronous to clk_rx

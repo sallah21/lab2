@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 module uart_rx #
 (
   parameter BAUD_RATE    = 115_200,             // Baud rate

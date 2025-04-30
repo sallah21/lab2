@@ -1,0 +1,5 @@
+csrc/*
+*.log
+*.key
+vcs_simv
+vcs_simv.daidir/*
