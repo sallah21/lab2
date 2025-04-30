@@ -4,3 +4,7 @@ csrc/*
 vcs_simv
 vcs_simv.daidir/*
 verdi_config_file
+*.conf
+*.rc
+*fsdb
+verdiLog/*
