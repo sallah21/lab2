@@ -39,7 +39,7 @@ module uart_tb
      .i_clk         (clk),
      .i_rst         (rst),
    
-     .i_rx_in       (rx_in),
+     .i_rx_in       (tx_out),
      .o_rx_in_i_clk (),
    
      .o_rx_data     (data_out),
@@ -47,6 +47,23 @@ module uart_tb
      .o_rx_data_rdy (data_rdy),
      .o_frm_err     ()
    );
+
+
+   reg send_data;
+   reg [7:0] bits_to_send_tx;
+   wire tx_out;
+   wire transmission;
+   uart_tx uart_tx_i
+   (
+        .i_clk         (clk),
+        .i_rst         (rst),
+    
+        .i_data_in     (bits_to_send_tx),
+        .i_send_data   (send_data),
+    
+        .o_tx_out      (tx_out),
+        .o_transmission(transmission)
+   ) ;//Uart transmitter
  
     initial  //Data to send preparation
        begin
@@ -68,28 +85,56 @@ module uart_tb
               end                      
        end
    
-   initial //Main Inital
+//    initial //Main Inital
+//        begin
+//            clk = 1'b1;
+//            rst = 1'b0;
+//            rx_in = 1'b1;
+//            bit_num = 0;
+//            send_data = 1'b0;
+
+//            #4000
+//            rst = 1'b1;   
+//            bits_to_send_tx = 8'b10101011; // 8'h55;
+//            send_data = 1'b1;
+//            #((BIT_TO_SEND_NUM + 10) * BAUD_RATE_T + 10000) 
+//            $finish;
+//        end      
+
+
+       initial //Main Initial
        begin
            clk = 1'b1;
            rst = 1'b0;
            rx_in = 1'b1;
            bit_num = 0;
-           
+           send_data = 1'b0;
+       
            #4000
-           rst = 1'b1;   
-
-           #((BIT_TO_SEND_NUM + 10) * BAUD_RATE_T + 10000) 
+           rst = 1'b1;
+       
+           for (i = 0; i < BYTE_TO_SEND_NUM; i = i + 1) begin
+               bits_to_send_tx = 8'b10101011; // 8'h55;
+               send_data = 1'b1; // Pulse send_data
+               #CLK_T;           // Wait for one clock cycle
+               send_data = 1'b0;
+       
+               // Wait for transmission to complete
+               wait (!transmission);
+               #BAUD_RATE_T; // Add some delay before sending the next byte
+           end
+       
+           #10000
            $finish;
        end       
-   
    always #(CLK_T/2) clk = ~clk; //clock 
    
-   always #(BAUD_RATE_T) //data sender
-        begin
-           bit_num = bit_num + 1;
-           rx_in = bits_to_send[bit_num];
-           if (bit_num >= BIT_TO_SEND_NUM) rx_in = 1'b1;
-        end  
+//    always #(BAUD_RATE_T) //data sender
+//         begin
+//            bit_num = bit_num + 1;
+//            rx_in = bits_to_send[bit_num];
+//            if (bit_num >= BIT_TO_SEND_NUM) rx_in = 1'b1;
+//         end  
    
    always @ (posedge data_rdy) //data monitor
     begin
