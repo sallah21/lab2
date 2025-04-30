@@ -18,7 +18,7 @@ module uart_tb
  reg clk;
  reg rst;
  reg rx_in;
- 
+
  reg [(BYTE_TO_SEND_NUM * 8)-1 : 0] bytes_to_send;
  reg [BIT_TO_SEND_NUM-1:0]          bits_to_send;
  
@@ -97,6 +97,22 @@ module uart_tb
         $display("Data received (hex, ASCII) = %h at time: %t", data_out, $time);
     end    
 
+    always # (BAUD_RATE_T) //Simulation monitor
+        begin
+            // $display("bitnum: %d  at time: %t", bit_num, $time);
+            if (bit_num%10 ==0 && rx_in==1) begin
+                $display("Start bit at time: %t", $time);
+            end 
+            else if (bit_num%10 ==9 && rx_in==0) begin
+                $display("Stop bit at time: %t", $time);
+            end 
+            else begin
+
+                $display("DATA send = %d at time: %t", rx_in, $time);
+            end
+
+        end
+    
 
     function [9:0] add_start_and_stop_bit;
         input [7:0] data;
