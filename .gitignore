@@ -12,3 +12,4 @@ vcs_simv.vdb/
 urgReport/
 *.xml
 vdCovLog/
+*fsdb*

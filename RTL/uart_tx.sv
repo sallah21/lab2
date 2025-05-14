@@ -29,7 +29,6 @@ reg [1:0] current_state;
 reg [1:0] next_state;
 reg       tx_out;
 
-
 always @(posedge i_clk or negedge i_rst) begin
   if (!i_rst) begin
     current_state <= IDLE;
@@ -38,47 +37,48 @@ always @(posedge i_clk or negedge i_rst) begin
     transmission <= 0;
     tx_out <= 1; // idle state for tx is high
   end
-  else begin 
-    if (i_baud_x16_en) begin
-      // State transition
-      current_state <= next_state;
-    end
+  else begin
+    // State transition
+    current_state <= next_state;
+
+    // TX out driving logic
+
+
     case (current_state)
       IDLE: begin
         if (i_send_data) begin
-          next_state <= START;
-        end else begin
-          next_state <= IDLE;
-        end
-      end
-      START: begin
           next_state <= DATA;
-          transmission <= 1;
+          data_pointer <= 0;
+
+        end 
+        else if (next_state == DATA && current_state == IDLE) begin
           tx_out <= 0; // start bit is low
+          transmission <= 1;
+        end 
       end
+
       DATA: begin
-        if (data_pointer < 7) begin
-          next_state <= DATA;
-          data_pointer <= data_pointer + 1;
-          tx_out <= i_data_in[data_pointer];
-        end else begin
+        tx_out <= i_data_in[data_pointer];
+        if (data_pointer == 7) begin
           next_state <= STOP;
+        end 
+        else begin
+          data_pointer <= data_pointer + 1;
         end
       end
       STOP: begin
-          next_state <= IDLE;
-          tx_out <= 1; // stop bit is high
-          transmission <= 0; // transmission complete
-          data_pointer <= 0; // reset data pointer
+        tx_out <= 1; // stop bit is high
+        next_state <= IDLE;
+        transmission <= 0; // transmission complete
       end
       default: begin
         next_state <= IDLE;
       end
-    endcase 
+    endcase
   end
-end 
-
+end
 
 assign o_transmission = transmission;
 assign o_tx_out = tx_out;
+
 endmodule // uart_tx
