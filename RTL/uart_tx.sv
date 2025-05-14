@@ -37,7 +37,7 @@ always @(posedge i_clk or negedge i_rst) begin
     transmission <= 0;
     tx_out <= 1; // idle state for tx is high
   end
-  else begin
+  else if (i_baud_x16_en)  begin
     // State transition
     current_state <= next_state;
 

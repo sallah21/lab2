@@ -117,7 +117,9 @@ module uart_tb
             //    wait(data_rdy); // Wait for data ready signal
                bits_to_send_tx = 8'b10101011; // 8'h55;
                send_data = 1'b1; // Pulse send_data
-               #CLK_T;           // Wait for one clock cycle
+               #CLK_T;           // Wait for three clock cycle
+               #CLK_T;
+               #CLK_T;
                send_data = 1'b0;
        
                // Wait for transmission to complete
