@@ -1,8 +1,8 @@
 `timescale 1ns / 1ps
 module uart_rx #
 (
-  parameter BAUD_RATE    = 115_200,             // Baud rate
-  parameter CLOCK_RATE   = 50_000_000
+  parameter BAUD_RATE ,           // Baud rate
+  parameter CLOCK_RATE 
 )
 (
   // Write side inputs
