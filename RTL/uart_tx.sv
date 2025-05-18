@@ -28,64 +28,67 @@ reg       transmission;
 reg [1:0] current_state;
 reg [1:0] next_state;
 reg       tx_out;
+reg [3:0] bit_timer;  // Counter for baud rate timing
 
 always @(posedge i_clk or negedge i_rst) begin
   if (!i_rst) begin
     current_state <= IDLE;
-    next_state <= IDLE;
     data_pointer <= 0;
     transmission <= 0;
     tx_out <= 1; // idle state for tx is high
+    bit_timer <= 4'd15; // Start at 15 to count down to 0
   end
   else if (i_baud_x16_en) begin
-    // State transition
-    current_state <= next_state;
-
-
-    // TX out driving logic
     case (current_state)
       IDLE: begin
+        tx_out <= 1; // idle state
+        bit_timer <= 4'd15; // Reset timer for next state
         if (i_send_data) begin
-          next_state <= START;
+          current_state <= START;
           data_pointer <= 0;
         end
-        tx_out <= 1; // idle state
       end
 
       START: begin
-
-        next_state <= DATA;
-        if (next_state == DATA) begin
-          // transmission <= 1; // transmission in progress
-          tx_out <= 0;
-          transmission <= 1;
+        tx_out <= 0; // start bit
+        if (bit_timer == 0) begin
+          current_state <= DATA;
+          bit_timer <= 4'd15; // Reset timer for data bits
+        end else begin
+          bit_timer <= bit_timer - 1;
         end
       end
 
       DATA: begin
         tx_out <= i_data_in[data_pointer];
-        if (data_pointer == 7) begin
-          next_state <= STOP;
-        end
-        else begin
-          data_pointer <= data_pointer + 1;
-        end
-        if (next_state == STOP) begin
-          // transmission <= 0; // transmission complete
-          tx_out <= 0;
+        if (bit_timer == 0) begin
+          if (data_pointer == 7) begin
+            current_state <= STOP;
+          end else begin
+            data_pointer <= data_pointer + 1;
+          end
+          bit_timer <= 4'd15; // Reset timer for next bit
+        end else begin
+          bit_timer <= bit_timer - 1;
         end
       end
 
       STOP: begin
-        tx_out <= 1; // stop bit is high
-        next_state <= IDLE;
-        transmission <= 0; // transmission complete
+        tx_out <= 1; // stop bit
+        if (bit_timer == 0) begin
+          current_state <= IDLE;
+        end else begin
+          bit_timer <= bit_timer - 1;
+        end
       end
 
       default: begin
-        next_state <= IDLE;
+        current_state <= IDLE;
       end
     endcase
+
+    // Update transmission status
+    transmission <= (current_state != IDLE);
   end
 end
 

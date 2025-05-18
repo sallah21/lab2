@@ -13,3 +13,4 @@ urgReport/
 *.xml
 vdCovLog/
 *fsdb*
+sim/

@@ -17,7 +17,7 @@ module uart_top
     output reg [7:0] data_out,
     output reg data_rdy,
     output reg o_transmission,
-    input reg send_data,
+    input reg send_data
 );
 
 uart_rx #                      //Uart receiver
